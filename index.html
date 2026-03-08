@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finanzas PRO | Dashboard</title>
-    
+    <meta name="theme-color" content="#0f111a"> 
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -22,26 +23,34 @@
             --neon-purple: #8b5cf6;
         }
 
-        html {
-            background-color: #0f111a; /* Forzamos el color oscuro exacto ignorando variables por seguridad */
-            overscroll-behavior-y: none; /* 🚀 ARMA SECRETA: Mata el efecto rebote en toda la página */
+        /* 1. Fondo base de la ventana y recuperamos el rebote */
+        html, body {
+            background-color: #0f111a; 
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
 
+        /* 2. El cuerpo de la app */
         body { 
             font-family: 'Outfit', sans-serif; 
-            background-color: var(--bg-base); 
             color: var(--text-main); 
             padding: 20px; 
-            margin: 0; 
-            min-height: 100vh; 
             box-sizing: border-box; 
-            overscroll-behavior-y: none; /* 🚀 ARMA SECRETA: Refuerzo para el cuerpo */
-            
-            /* Fondo sutil con luces desenfocadas */
+            position: relative; /* Necesario para la capa de luces */
+        }
+
+        /* 3. 🚀 EL TRUCO MAESTRO: Capa falsa para el fondo fijo */
+        /* Esto evita el bug de los celulares que corta el fondo a la mitad */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1; /* Lo manda detrás de todo */
+            background-color: var(--bg-base);
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
                 radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
-            background-attachment: fixed;
         }
 
         .cabecera { text-align: center; margin-bottom: 40px; margin-top: 20px;}
