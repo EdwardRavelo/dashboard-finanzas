@@ -25,26 +25,34 @@
             --neon-purple: #8b5cf6;
         }
 
-        /* 1. EL LIENZO BASE (Fija el color del rebote en celulares) */
+        /* 1. EL LIENZO BASE (Fondo oscuro puro para el resorte) */
         html, body {
-            background-color: #0f111a !important; /* El color del abismo puro */
+            background-color: #0f111a !important; 
             margin: 0;
             padding: 0;
+            height: 100%; /* Obligamos a que cubra todo */
         }
 
-        /* 2. EL CONTENEDOR MAESTRO (Aquí va el diseño de la app) */
+        /* 2. EL FONDO DE LUCES (Separado físicamente para que no se rompa al rebotar) */
+        .fondo-luces {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; /* Lo manda al fondo de todo */
+            background-color: #0f111a;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+        }
+
+        /* 3. EL CONTENEDOR MAESTRO */
         .app-container {
             font-family: 'Outfit', sans-serif; 
             color: var(--text-main); 
             padding: 20px; 
-            min-height: 100vh; 
+            min-height: 100%; 
             box-sizing: border-box; 
-            
-            /* El fondo de luces desenfocadas ahora vive acá */
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
-            background-attachment: fixed;
+            position: relative;
+            /* Le quitamos el fondo de luces y el attachment fixed para que el celular no colapse */
         }
 
         .cabecera { text-align: center; margin-bottom: 40px; margin-top: 20px;}
@@ -143,6 +151,8 @@
     </style>
 </head>
 <body>
+
+    <div class="fondo-luces"></div>
 
     <div class="app-container">
 
