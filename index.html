@@ -23,7 +23,8 @@
         }
 
         html {
-            background-color: var(--bg-base); /* Esto pinta el hueco blanco del "rebote" en celulares */
+            background-color: #0f111a; /* Forzamos el color oscuro exacto ignorando variables por seguridad */
+            overscroll-behavior-y: none; /* 🚀 ARMA SECRETA: Mata el efecto rebote en toda la página */
         }
 
         body { 
@@ -32,8 +33,10 @@
             color: var(--text-main); 
             padding: 20px; 
             margin: 0; 
-            min-height: 100vh; /* Obliga a que el fondo cubra TODA la pantalla siempre */
-            box-sizing: border-box; /* Evita que el padding rompa las medidas */
+            min-height: 100vh; 
+            box-sizing: border-box; 
+            overscroll-behavior-y: none; /* 🚀 ARMA SECRETA: Refuerzo para el cuerpo */
+            
             /* Fondo sutil con luces desenfocadas */
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
