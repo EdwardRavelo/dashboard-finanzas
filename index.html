@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzas PRO | Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* 🎨 THEME FINTECH DARK + GLASSMORPHISM */
+        :root {
+            --bg-base: #0f111a; 
+            --card-bg: rgba(255, 255, 255, 0.03); 
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --neon-green: #10b981;
+            --neon-purple: #8b5cf6;
+        }
+
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background-color: var(--bg-base); 
+            color: var(--text-main); 
+            padding: 20px; 
+            margin: 0; 
+            /* Fondo sutil con luces desenfocadas */
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+            background-attachment: fixed;
+        }
+
+        .cabecera { text-align: center; margin-bottom: 40px; margin-top: 20px;}
+        h1 { font-weight: 800; font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(to right, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Controles de la cabecera (Mes y Botón) */
+        .controles-header { display: flex; justify-content: center; align-items: center; gap: 15px; }
+        
+        select { 
+            padding: 12px 24px; font-size: 16px; border-radius: 12px; 
+            background-color: rgba(255, 255, 255, 0.05); color: var(--text-main); 
+            border: 1px solid var(--card-border); outline: none; 
+            font-family: 'Outfit'; cursor: pointer; transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        select:hover { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+        select option { background-color: var(--bg-base); }
+
+        /* Estilo para el botón mágico */
+        .btn-accion {
+            background: linear-gradient(135deg, var(--accent), var(--neon-purple));
+            color: white; border: none; padding: 12px 24px; border-radius: 12px;
+            font-family: 'Outfit'; font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        .btn-accion:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6); }
+        .btn-accion:disabled { background: #475569; box-shadow: none; cursor: not-allowed; transform: none; }
+
+        /* Tarjetas de Cristal */
+        .contenedor-kpi { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 40px; }
+        .tarjeta { 
+            background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border); padding: 25px 40px; border-radius: 20px; 
+            min-width: 180px; text-align: center; transition: transform 0.3s;
+        }
+        .tarjeta:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.15); }
+        .titulo-kpi { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+        .valor-kpi { font-size: 32px; font-weight: 800; margin-top: 10px; }
+        .kpi-total { color: var(--neon-green); text-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+
+        /* Grilla de gráficos */
+        .contenedor-graficos { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .grafico-caja { 
+            background: var(--card-bg); backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border); padding: 25px; border-radius: 24px; 
+        }
+        .grafico-largo { grid-column: 1 / -1; }
+        .chart-container { position: relative; height: 320px; width: 100%; }
+
+        /* Tabla Cyberpunk */
+        .contenedor-tabla { max-width: 1200px; margin: 25px auto; }
+        .tabla-elegante { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 15px; }
+        .tabla-elegante th { color: var(--text-muted); padding: 12px 20px; text-align: left; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--card-border); }
+        .tabla-elegante td { background: rgba(255,255,255,0.02); padding: 16px 20px; font-size: 15px; color: var(--text-main); }
+        .tabla-elegante tr td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+        .tabla-elegante tr td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+        .tabla-elegante tr:hover td { background: rgba(255,255,255,0.05); }
+        
+        .monto-tabla { font-weight: 800; color: var(--neon-purple); }
+    </style>
+</head>
+<body>
+
+    <div class="cabecera">
+        <h1>Dashboard Financiero</h1>
+        <div class="controles-header">
+            <select id="selector-mes"><option value="">Conectando a base de datos...</option></select>
+            
+            <input type="file" id="input-archivo" accept=".xls,.xlsx,.csv" style="display: none;">
+            <button id="btn-subir" class="btn-accion">💳 Subir Resumen</button>
+            
+            <button id="btn-clasificar" class="btn-accion" style="background: linear-gradient(135deg, #10b981, #059669);">🔍 Clasificar</button>
+        </div>
+    </div>
+
+    <div class="contenedor-kpi">
+        <div class="tarjeta">
+            <div class="titulo-kpi">Gasto Crédito</div>
+            <div class="valor-kpi" id="val-credito">...</div>
+            <div id="val-credito-usd" style="color: var(--text-muted); font-size: 14px; margin-top: 5px; font-weight: 600;">...</div>
+        </div>
+        <div class="tarjeta">
+            <div class="titulo-kpi">Gasto Débito</div>
+            <div class="valor-kpi" id="val-debito">...</div>
+            <div id="val-debito-usd" style="color: var(--text-muted); font-size: 14px; margin-top: 5px; font-weight: 600;">...</div>
+        </div>
+        <div class="tarjeta">
+            <div class="titulo-kpi" style="color: var(--neon-green)">Total del Mes</div>
+            <div class="valor-kpi kpi-total" id="val-total">...</div>
+            <div id="val-total-usd" style="color: rgba(16, 185, 129, 0.8); font-size: 15px; margin-top: 5px; font-weight: 600;">...</div>
+        </div>
+    </div>
+
+    <div class="contenedor-graficos">
+        <div class="grafico-caja">
+            <h3 style="margin-top:0; color:var(--text-main); font-weight:600; font-size:16px;">Distribución</h3>
+            <div class="chart-container"><canvas id="grafico-torta"></canvas></div>
+        </div>
+        <div class="grafico-caja">
+            <h3 style="margin-top:0; color:var(--text-main); font-weight:600; font-size:16px;">Top 10 Comercios</h3>
+            <div class="chart-container"><canvas id="grafico-top"></canvas></div>
+        </div>
+        <div class="grafico-caja grafico-largo">
+            <h3 style="margin-top:0; color:var(--text-main); font-weight:600; font-size:16px;">Evolución Histórica</h3>
+            <div class="chart-container" style="height: 350px;"><canvas id="grafico-evolucion"></canvas></div>
+        </div>
+    </div>
+
+    <div class="contenedor-tabla">
+        <div class="grafico-caja">
+            <h3 style="margin-top:0; color:var(--text-main); font-weight:600; font-size:16px;">Detalle de Cuotas Pendientes</h3>
+            <table class="tabla-elegante">
+                <thead>
+                    <tr>
+                        <th>Comercio</th>
+                        <th style="text-align: center;">Cuota</th>
+                        <th style="text-align: right;">Monto</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-cuotas">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <style>
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-caja {
+            background: var(--bg-base); border: 1px solid var(--card-border);
+            width: 90%; max-width: 800px; max-height: 80vh; border-radius: 20px;
+            padding: 30px; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+        .modal-close:hover { color: white; }
+
+        /* ========================================================= */
+        /* 📱 RESPONSIVE DESIGN (Celulares y Tablets)                */
+        /* ========================================================= */
+        @media (max-width: 768px) {
+            /* 1. Achicamos el título para que no ocupe media pantalla */
+            h1 { font-size: 1.8rem; }
+            
+            /* 2. Apilamos los controles (Mes, Importar, Clasificar) uno debajo del otro */
+            .controles-header { flex-direction: column; width: 100%; gap: 10px; }
+            .controles-header select, .controles-header button { 
+                width: 100%; 
+                margin-left: 0; /* Quitamos el margen lateral que tenían en PC */
+            }
+
+            /* 3. Las tarjetas de KPIs ocupan todo el ancho */
+            .tarjeta { width: 100%; padding: 15px 20px; }
+
+            /* 4. Rompemos la grilla: Los gráficos pasan a estar uno debajo del otro (1 columna) */
+            .contenedor-graficos { grid-template-columns: 1fr; }
+            .grafico-caja { padding: 15px; }
+            .chart-container { height: 280px; } /* Un poquito más bajos para que entren mejor */
+
+            /* 5. Blindaje de Tablas: Permitimos scroll horizontal para que no rompan la web */
+            .contenedor-tabla .grafico-caja { overflow-x: auto; }
+            #contenido-modal { overflow-x: auto; }
+            
+            /* Evitamos que los textos de la tabla se partan en varias líneas */
+            .tabla-elegante th, .tabla-elegante td { white-space: nowrap; padding: 12px 10px; }
+            
+            /* 6. Ajustamos la ventana de cristal (Modal) */
+            .modal-caja { width: 95%; padding: 20px; }
+            .modal-header h2 { font-size: 1.2rem; }
+        }
+    </style>
+
+    <div class="modal-overlay" id="modal-clasificar">
+        <div class="modal-caja">
+            <div class="modal-header">
+                <h2 style="margin: 0; color: var(--neon-green);">🔍 Clasificar Comercios Pendientes</h2>
+                <button class="modal-close" onclick="cerrarModal()">✖</button>
+            </div>
+            <div id="contenido-modal">
+                <p style="text-align: center; color: var(--text-muted);">Cargando pendientes...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
