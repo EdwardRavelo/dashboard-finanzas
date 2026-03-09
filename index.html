@@ -13,7 +13,7 @@
     <style>
         /* 🎨 THEME FINTECH DARK + GLASSMORPHISM */
         :root {
-            color-scheme: dark; /* Magia para scrollbars y rebotes oscuros */
+            color-scheme: dark; 
             --bg-base: #0f111a; 
             --card-bg: rgba(255, 255, 255, 0.03); 
             --card-border: rgba(255, 255, 255, 0.08);
@@ -25,19 +25,19 @@
             --neon-purple: #8b5cf6;
         }
 
-        /* 1. EL LIENZO BASE (Fondo oscuro puro para el resorte) */
+        /* 1. EL LIENZO BASE */
         html, body {
             background-color: #0f111a !important; 
             margin: 0;
             padding: 0;
-            height: 100%; /* Obligamos a que cubra todo */
+            height: 100%; 
         }
 
-        /* 2. EL FONDO DE LUCES (Separado físicamente para que no se rompa al rebotar) */
+        /* 2. EL FONDO DE LUCES */
         .fondo-luces {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1; /* Lo manda al fondo de todo */
+            z-index: -1; 
             background-color: #0f111a;
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
@@ -52,22 +52,21 @@
             min-height: 100%; 
             box-sizing: border-box; 
             position: relative;
-            /* Le quitamos el fondo de luces y el attachment fixed para que el celular no colapse */
         }
 
         .cabecera { text-align: center; margin-bottom: 40px; margin-top: 20px;}
-        h1 { font-weight: 800; font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(to right, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h1 { font-weight: 800; font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(to right, #3b82f6, #8b5cf6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         
         .controles-header { display: flex; justify-content: center; align-items: center; gap: 15px; }
         
-        select { 
+        select, input[type="month"] { 
             padding: 12px 24px; font-size: 16px; border-radius: 12px; 
             background-color: rgba(255, 255, 255, 0.05); color: var(--text-main); 
             border: 1px solid var(--card-border); outline: none; 
             font-family: 'Outfit'; cursor: pointer; transition: all 0.3s;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px); color-scheme: dark;
         }
-        select:hover { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+        select:hover, input[type="month"]:hover { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
         select option { background-color: var(--bg-base); }
 
         .btn-accion {
@@ -90,20 +89,51 @@
         .valor-kpi { font-size: 32px; font-weight: 800; margin-top: 10px; }
         .kpi-total { color: var(--neon-green); text-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
 
-        .contenedor-graficos { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1200px; margin: 0 auto; }
-        .grafico-caja { 
-            background: var(--card-bg); backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border); padding: 25px; border-radius: 24px; 
+        /* ========================================================= */
+        /* 🍱 BENTO GRID (Layout Modular Desktop)                    */
+        /* ========================================================= */
+        .bento-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 20px; 
+            max-width: 1200px; 
+            margin: 0 auto 40px auto; 
         }
-        .grafico-largo { grid-column: 1 / -1; }
-        .chart-container { position: relative; height: 320px; width: 100%; }
+        
+        .bento-caja { 
+            background: var(--card-bg); 
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border); 
+            padding: 20px 25px; 
+            border-radius: 24px; 
+            display: flex;
+            flex-direction: column;
+        }
 
-        .contenedor-tabla { max-width: 1200px; margin: 25px auto; }
-        .tabla-elegante { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 15px; }
-        .tabla-elegante th { color: var(--text-muted); padding: 12px 20px; text-align: left; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--card-border); }
-        .tabla-elegante td { background: rgba(255,255,255,0.02); padding: 16px 20px; font-size: 15px; color: var(--text-main); }
-        .tabla-elegante tr td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
-        .tabla-elegante tr td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+        .bento-caja h3 { 
+            margin-top: 0; 
+            color: var(--text-main); 
+            font-weight: 600; 
+            font-size: 16px; 
+            margin-bottom: 15px;
+        }
+
+        /* Asignación de bloques en el tablero (Desktop) */
+        .area-evo { grid-column: span 2; }
+        .area-torta { grid-column: span 1; }
+        .area-top { grid-column: span 1; }
+        .area-cuotas { grid-column: span 2; }
+        .area-extracto { grid-column: span 3; }
+
+        /* Ajuste de altura para evitar scroll vertical */
+        .chart-container { position: relative; height: 260px; width: 100%; flex-grow: 1; }
+
+        /* Tablas rediseñadas para el Bento */
+        .tabla-elegante { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
+        .tabla-elegante th { color: var(--text-muted); padding: 10px 15px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--card-border); }
+        .tabla-elegante td { background: rgba(255,255,255,0.02); padding: 12px 15px; font-size: 14px; color: var(--text-main); }
+        .tabla-elegante tr td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        .tabla-elegante tr td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
         .tabla-elegante tr:hover td { background: rgba(255,255,255,0.05); }
         .monto-tabla { font-weight: 800; color: var(--neon-purple); }
 
@@ -136,23 +166,26 @@
         @media (max-width: 768px) {
             h1 { font-size: 1.8rem; }
             .controles-header { flex-direction: column; width: 100%; gap: 10px; }
-            .controles-header select, .controles-header button { width: 100%; margin-left: 0; }
+            .controles-header select, .controles-header input[type="month"], .controles-header button { width: 100%; margin-left: 0; }
             .tarjeta { width: 100%; padding: 15px 20px; }
-            .contenedor-graficos { grid-template-columns: 1fr; }
-            .grafico-caja { padding: 15px; }
-            .chart-container { height: 280px; } 
-            .contenedor-tabla .grafico-caja { overflow-x: auto; }
+            
+            /* Bento se adapta a celular (1 columna) */
+            .bento-grid { grid-template-columns: 1fr; gap: 15px; }
+            .area-evo, .area-torta, .area-top, .area-cuotas, .area-extracto { grid-column: span 1; }
+            
+            .bento-caja { padding: 15px; }
+            .chart-container { height: 260px; } 
+            .bento-caja > div[style*="overflow-x"] { overflow-x: auto; }
             #contenido-modal { overflow-x: auto; }
             .tabla-elegante th, .tabla-elegante td { white-space: nowrap; padding: 12px 10px; }
             .modal-caja { width: 95%; padding: 20px; }
             .modal-header h2 { font-size: 1.2rem; }
-            .app-container { padding: 10px; } /* Menos margen en celular */
+            .app-container { padding: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <body>
     <script>
         document.documentElement.style.setProperty('background-color', '#0f111a', 'important');
         document.body.style.setProperty('background-color', '#0f111a', 'important');
@@ -160,20 +193,17 @@
 
     <div class="fondo-luces"></div>
 
-
     <div class="app-container">
 
         <div class="cabecera">
             <h1>Dashboard Financiero</h1>
             <div class="controles-header">
-            <select id="selector-mes"><option value="">Conectando a base de datos...</option></select>
-            
-            <input type="month" id="mes-destino" style="padding: 11px; border-radius: 12px; background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--card-border); color-scheme: dark; font-family: 'Outfit';">
-            
-            <input type="file" id="input-archivo" accept=".xls,.xlsx,.csv" style="display: none;">
-            <button id="btn-subir" class="btn-accion">💳 Subir Resumen</button>
-            <button id="btn-clasificar" class="btn-accion" style="background: linear-gradient(135deg, #10b981, #059669);">🔍 Clasificar</button>
-        </div>
+                <select id="selector-mes"><option value="">Conectando a base de datos...</option></select>
+                <input type="month" id="mes-destino">
+                <input type="file" id="input-archivo" accept=".xls,.xlsx,.csv" style="display: none;">
+                <button id="btn-subir" class="btn-accion">💳 Subir Resumen</button>
+                <button id="btn-clasificar" class="btn-accion" style="background: linear-gradient(135deg, #10b981, #059669);">🔍 Clasificar</button>
+            </div>
         </div>
 
         <div class="contenedor-kpi">
@@ -194,36 +224,57 @@
             </div>
         </div>
 
-        <div class="contenedor-graficos">
-            <div class="grafico-caja">
-                <h3 style="margin-top:0; color:var(--text-main); font-weight:600; font-size:16px;">Distribución</h3>
+        <div class="bento-grid">
+            
+            <div class="bento-caja area-evo">
+                <h3>Evolución Histórica</h3>
+                <div class="chart-container"><canvas id="grafico-evolucion"></canvas></div>
+            </div>
+
+            <div class="bento-caja area-torta">
+                <h3>Distribución</h3>
                 <div class="chart-container"><canvas id="grafico-torta"></canvas></div>
             </div>
-            <div class="grafico-caja">
-                <h3 style="margin-top:0; color:var(--text-main); font-weight:600; font-size:16px;">Top 10 Comercios</h3>
+
+            <div class="bento-caja area-top">
+                <h3>Top 10 Comercios</h3>
                 <div class="chart-container"><canvas id="grafico-top"></canvas></div>
             </div>
-            <div class="grafico-caja grafico-largo">
-                <h3 style="margin-top:0; color:var(--text-main); font-weight:600; font-size:16px;">Evolución Histórica</h3>
-                <div class="chart-container" style="height: 350px;"><canvas id="grafico-evolucion"></canvas></div>
-            </div>
-        </div>
 
-        <div class="contenedor-tabla">
-            <div class="grafico-caja">
-                <h3 style="margin-top:0; color:var(--text-main); font-weight:600; font-size:16px;">Detalle de Cuotas Pendientes</h3>
-                <table class="tabla-elegante">
-                    <thead>
-                        <tr>
-                            <th>Comercio</th>
-                            <th style="text-align: center;">Cuota</th>
-                            <th style="text-align: right;">Monto</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cuerpo-cuotas">
-                        </tbody>
-                </table>
+            <div class="bento-caja area-cuotas">
+                <h3>Detalle de Cuotas Pendientes</h3>
+                <div style="overflow-x: auto;">
+                    <table class="tabla-elegante">
+                        <thead>
+                            <tr>
+                                <th>Comercio</th>
+                                <th style="text-align: center;">Cuota</th>
+                                <th style="text-align: right;">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpo-cuotas"></tbody>
+                    </table>
+                </div>
             </div>
+
+            <div class="bento-caja area-extracto">
+                <h3>📄 Extracto del Mes</h3>
+                <div style="overflow-x: auto;">
+                    <table class="tabla-elegante">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Comercio</th>
+                                <th>Categoría</th>
+                                <th style="text-align: right;">Monto ARS</th>
+                                <th style="text-align: right;">Monto USD</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpo-extracto"></tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
         <footer class="footer-app">
