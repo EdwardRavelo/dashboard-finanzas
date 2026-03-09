@@ -166,11 +166,14 @@
         <div class="cabecera">
             <h1>Dashboard Financiero</h1>
             <div class="controles-header">
-                <select id="selector-mes"><option value="">Conectando a base de datos...</option></select>
-                <input type="file" id="input-archivo" accept=".xls,.xlsx,.csv" style="display: none;">
-                <button id="btn-subir" class="btn-accion">💳 Subir Resumen</button>
-                <button id="btn-clasificar" class="btn-accion" style="background: linear-gradient(135deg, #10b981, #059669);">🔍 Clasificar</button>
-            </div>
+            <select id="selector-mes"><option value="">Conectando a base de datos...</option></select>
+            
+            <input type="month" id="mes-destino" style="padding: 11px; border-radius: 12px; background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--card-border); color-scheme: dark; font-family: 'Outfit';">
+            
+            <input type="file" id="input-archivo" accept=".xls,.xlsx,.csv" style="display: none;">
+            <button id="btn-subir" class="btn-accion">💳 Subir Resumen</button>
+            <button id="btn-clasificar" class="btn-accion" style="background: linear-gradient(135deg, #10b981, #059669);">🔍 Clasificar</button>
+        </div>
         </div>
 
         <div class="contenedor-kpi">

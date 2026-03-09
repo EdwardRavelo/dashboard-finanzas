@@ -10,7 +10,7 @@ let chartTorta, chartTop, chartEvo;
 // =====================================================================
 // 🚀 2. INICIO Y NAVEGACIÓN
 // =====================================================================
-// Solución al Diagnóstico 1: Disparo directo (Sin DOMContentLoaded)
+// Disparo directo (Sin DOMContentLoaded)
 cargarDatosDelServidor("");
 
 // Escuchamos los cambios en el menú de meses
@@ -22,11 +22,10 @@ document.getElementById('selector-mes').addEventListener('change', function(even
 // 📥 3. MÓDULO DE LECTURA DE DATOS (GET)
 // =====================================================================
 async function cargarDatosDelServidor(mesRequerido) {
-    // Solución al Diagnóstico 2: Feedback de UI contra la latencia
     const selector = document.getElementById('selector-mes');
-    selector.disabled = true; // Bloqueamos el selector para evitar clics ansiosos
+    selector.disabled = true; 
     
-    // Ponemos un efecto de reloj de arena elegante en los KPIs
+    // Feedback visual (reloj de arena)
     document.getElementById('val-credito').innerText = '⏳';
     document.getElementById('val-debito').innerText = '⏳';
     document.getElementById('val-total').innerText = '⏳';
@@ -44,7 +43,7 @@ async function cargarDatosDelServidor(mesRequerido) {
         console.error("Error al conectar con la base de datos:", error);
         alert("Ocurrió un error al cargar los datos del servidor.");
     } finally {
-        selector.disabled = false; // Desbloqueamos el selector cuando termina
+        selector.disabled = false; 
     }
 }
 
@@ -185,14 +184,49 @@ function dibujarPantalla(datos) {
         filaVacia.appendChild(celdaVacia);
         cuerpoTabla.appendChild(filaVacia);
     }
+
+    // 🚀 7. NUEVO: DIBUJAR EXTRACTO DEL MES (A prueba de fallos si no tenés el HTML)
+    const cuerpoExtracto = document.getElementById('cuerpo-extracto');
+    if (cuerpoExtracto) {
+        cuerpoExtracto.innerHTML = ''; 
+
+        if (!datos.extracto || datos.extracto.length === 0) {
+            cuerpoExtracto.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 20px;">No hay movimientos este mes.</td></tr>';
+        } else {
+            datos.extracto.forEach(mov => {
+                const colorMonto = mov.tipo === 'DEBITO' ? 'var(--neon-green)' : 'var(--text-main)';
+                const textUSD = mov.montoUSD > 0 ? `u$s ${mov.montoUSD.toFixed(2)}` : '<span style="color: rgba(255,255,255,0.1)">-</span>';
+                const textARS = mov.montoARS > 0 ? `$ ${mov.montoARS.toLocaleString('es-AR')}` : '<span style="color: rgba(255,255,255,0.1)">-</span>';
+                
+                cuerpoExtracto.innerHTML += `
+                    <tr>
+                        <td style="color: var(--text-muted); font-size: 13px;">${mov.fecha}</td>
+                        <td style="font-weight: 600;">${mov.comercio}</td>
+                        <td><span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">${mov.categoria}</span></td>
+                        <td style="text-align: right; font-weight: 800; color: ${colorMonto};">${textARS}</td>
+                        <td style="text-align: right; color: var(--text-muted); font-size: 14px;">${textUSD}</td>
+                    </tr>
+                `;
+            });
+        }
+    }
 }
 
 // =====================================================================
 // 📤 5. MÓDULO DE SUBIDA DE ARCHIVOS (POST)
 // =====================================================================
 
-// Cuando clickean "Subir Resumen", simulamos un clic en el input oculto
+// Cuando clickean "Subir Resumen", validamos el mes destino
 document.getElementById('btn-subir').addEventListener('click', () => {
+    // 🚀 NUEVO: Exigimos que haya seleccionado un mes
+    const mesDestino = document.getElementById('mes-destino') ? document.getElementById('mes-destino').value : null;
+    
+    // Si el input existe pero está vacío, frenamos el proceso
+    if (document.getElementById('mes-destino') && !mesDestino) {
+        alert("⚠️ Por favor, selecciona a qué mes corresponde el resumen antes de subirlo.");
+        return;
+    }
+    
     document.getElementById('input-archivo').click();
 });
 
@@ -201,56 +235,55 @@ document.getElementById('input-archivo').addEventListener('change', function(eve
     const archivo = evento.target.files[0];
     if (!archivo) return; 
 
-    // Preparamos el conversor a texto (Base64)
+    // Capturamos el mes que eligió el usuario
+    const mesDestino = document.getElementById('mes-destino') ? document.getElementById('mes-destino').value : "";
+
     const lector = new FileReader();
     
-    // Lo que sucede cuando termina de leer el archivo
     lector.onload = async function(e) {
         const contenidoBase64 = e.target.result;
         
-        // Cambiamos el botón para dar feedback
         const boton = document.getElementById('btn-subir');
         boton.innerText = "⏳ Procesando...";
         boton.disabled = true;
 
         try {
-            // Empaquetamos todo
+            // Empaquetamos todo, incluyendo la Ley Absoluta del mes
             const paquete = {
                 accion: "subir_e_importar",
                 nombre: archivo.name,
                 mimeType: archivo.type,
-                archivoBase64: contenidoBase64
+                archivoBase64: contenidoBase64,
+                mesDestino: mesDestino // 🚀 NUEVO: Mandamos el mes al servidor
             };
 
-            // Enviamos al servidor
             const respuesta = await fetch(API_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'text/plain' }, // Evita bloqueos CORS
+                headers: { 'Content-Type': 'text/plain' }, 
                 body: JSON.stringify(paquete)
             });
 
-            // Leemos la respuesta de Google
             const resultado = await respuesta.json();
             alert(resultado.mensaje);
 
-            // Si fue un éxito, recargamos el dashboard actual
             if (resultado.exito) {
-                const mesActual = document.getElementById('selector-mes').value;
-                cargarDatosDelServidor(mesActual);
+                // Si todo salió bien, actualizamos la pantalla para ver los datos frescos
+                const selectorMes = document.getElementById('selector-mes');
+                if (selectorMes) {
+                    cargarDatosDelServidor(selectorMes.value);
+                }
             }
             
         } catch (error) {
             console.error("Error en la subida:", error);
             alert("Ocurrió un error al intentar enviar el archivo al servidor.");
         } finally {
-            // Regresamos el botón a su estado normal
             boton.innerText = "💳 Subir Resumen";
             boton.disabled = false;
             document.getElementById('input-archivo').value = ""; 
         }
     };
     
-    // Arrancamos la lectura del archivo
     lector.readAsDataURL(archivo);
 });
 
@@ -273,18 +306,15 @@ document.getElementById('btn-clasificar').addEventListener('click', async () => 
             return;
         }
 
-        // Construimos la tabla interactiva
         let htmlTabla = `
             <table class="tabla-elegante" id="tabla-pendientes">
                 <thead><tr><th>Nombre Original</th><th>Sugerencia (Editable)</th><th>Categoría</th></tr></thead>
                 <tbody>
         `;
 
-        // Generamos las opciones de categorías
         let opcionesCat = `<option value="">-- Seleccionar --</option>`;
         datos.categorias.forEach(cat => opcionesCat += `<option value="${cat}">${cat}</option>`);
 
-        // Generamos las filas
         datos.pendientes.forEach((item, index) => {
             htmlTabla += `
                 <tr data-cruda="${item.cruda}">
@@ -300,7 +330,6 @@ document.getElementById('btn-clasificar').addEventListener('click', async () => 
         
         contenedor.innerHTML = htmlTabla;
 
-        // Le damos vida al botón de guardar
         document.getElementById('btn-guardar-clasif').addEventListener('click', guardarClasificaciones);
 
     } catch (error) {
@@ -316,7 +345,6 @@ async function guardarClasificaciones() {
     const filas = document.querySelectorAll('#tabla-pendientes tbody tr');
     const reglasParaGuardar = [];
 
-    // Recolectamos solo las filas donde el usuario eligió una categoría
     filas.forEach(fila => {
         const inputClave = fila.querySelector('.input-sugerencia').value.trim().toUpperCase();
         const selectCat = fila.querySelector('.select-categoria').value;
@@ -352,7 +380,6 @@ async function guardarClasificaciones() {
 
         if (resultado.exito) {
             cerrarModal();
-            // Refrescamos el Dashboard para ver cómo la porción "A CLASIFICAR" desaparece de la torta
             const mesActual = document.getElementById('selector-mes').value;
             cargarDatosDelServidor(mesActual);
         }
